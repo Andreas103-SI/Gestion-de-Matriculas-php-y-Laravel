@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('specialty_code')->unique();
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->boolean('active')->default(true);
-            $table->integer('theoretical_hours');
-            $table->integer('practical_hours');
+            $table->text('description');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->integer('capacity');
+            $table->string('location');
+            $table->decimal('price', 8, 2);
             $table->timestamps();
         });
     }
