@@ -13,11 +13,12 @@ class Enrollment extends Model
         'student_id',
         'course_id',
         'enrollment_date',
+        'enrollment_document',
         'status',
     ];
 
     protected $casts = [
-        'enrollment_date' => 'datetime',
+        'enrollment_date' => 'date',
     ];
 
     public function student()

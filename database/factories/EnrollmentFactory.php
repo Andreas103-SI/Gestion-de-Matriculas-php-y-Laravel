@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Student;
+use App\Models\Course;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,18 +11,13 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class EnrollmentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'student_id',
-            'course_id',
-            'enrollment_date',
-            'status',
+            'student_id' => $this->faker->randomElement(Student::pluck('id')->toArray()),
+            'course_id' => $this->faker->randomElement(Course::pluck('id')->toArray()),
+            'enrollment_document' => $this->faker->uuid(),
+            'enrollment_date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
         ];
     }
 }
