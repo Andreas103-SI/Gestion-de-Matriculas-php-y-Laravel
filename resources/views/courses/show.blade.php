@@ -9,7 +9,10 @@
             <p><strong>Descripción:</strong> {{ $course->description ?? 'No especificada' }}</p>
             <p><strong>Fecha de Inicio:</strong> {{ $course->start_date }}</p>
             <p><strong>Fecha de Fin:</strong> {{ $course->end_date }}</p>
-            <p><strong>Número de Estudiantes:</strong> {{ $course->students_count }}</p>
+            <p><strong>Capacidad:</strong> {{ $course->capacity }}</p>
+            <p><strong>Ubicación:</strong> {{ $course->location ?? 'No especificada' }}</p>
+            <p><strong>Precio:</strong> {{ number_format($course->price, 2) }} €</p>
+            <p><strong>Estudiantes Inscritos:</strong> {{ $course->enrollments->count() }}</p>
         </div>
     </div>
     <div class="mt-3">

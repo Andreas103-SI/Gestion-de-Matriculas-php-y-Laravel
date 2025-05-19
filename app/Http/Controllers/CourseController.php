@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use App\Http\Requests\CourseRequest;
 
 class CourseController extends Controller
 {
@@ -40,9 +41,10 @@ class CourseController extends Controller
 
     // Muestra los detalles de un curso específico
     public function show(Course $course)
-    {
-        return view('courses.show', compact('course'));
-    }
+{
+    $course->load('enrollments');
+    return view('courses.show', compact('course'));
+}
 
     // Muestra el formulario para editar un curso existente
     public function edit(Course $course)
@@ -51,22 +53,12 @@ class CourseController extends Controller
     }
 
     // Actualiza un curso existente en la base de datos
-    public function update(Request $request, Course $course)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'capacity' => 'required|integer|min:1',
-            'location' => 'nullable|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
+    public function update(CourseRequest $request, Course $course)
+{
+    $course->update($request->validated());
 
-        $course->update($validated);
-
-        return redirect()->route('courses.index')->with('success', 'Curso actualizado con éxito.');
-    }
+    return redirect()->route('courses.index')->with('success', 'Curso actualizado con éxito.');
+}
 
     // Elimina un curso de la base de datos
     public function destroy(Course $course)

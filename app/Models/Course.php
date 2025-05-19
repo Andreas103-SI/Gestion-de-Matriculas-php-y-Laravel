@@ -16,6 +16,7 @@ class Course extends Model
         'capacity',
         'location',
         'price',
+        
     ];
    
     protected $casts = [
@@ -28,6 +29,11 @@ class Course extends Model
     public function students()
     {
         return $this->belongsToMany(Student::class, 'enrollments');
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
     }
    
 }
