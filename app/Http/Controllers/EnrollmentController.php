@@ -30,9 +30,12 @@ class EnrollmentController extends Controller
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'course_id' => 'required|exists:courses,id',
-            'enrollment_document' => 'required|string|max:255',
+            // 'enrollment_document' ya no se valida porque se genera automáticamente
             'enrollment_date' => 'required|date',
         ]);
+
+        // Generar UUID automáticamente
+        $validated['enrollment_document'] = \Illuminate\Support\Str::uuid();
 
         Enrollment::create($validated);
 
