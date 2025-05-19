@@ -4,41 +4,7 @@
     <h1 class="mb-4">Crear Curso</h1>
     <form action="{{ route('courses.store') }}" method="POST">
         @csrf
-        <div class="mb-3">
-            <label for="name" class="form-label">Nombre</label>
-            <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
-            @error('name') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Descripción</label>
-            <textarea name="description" id="description" class="form-control">{{ old('description') }}</textarea>
-            @error('description') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="start_date" class="form-label">Fecha de Inicio</label>
-            <input type="datetime-local" name="start_date" id="start_date" class="form-control" value="{{ old('start_date') }}" required>
-            @error('start_date') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="end_date" class="form-label">Fecha de Fin</label>
-            <input type="datetime-local" name="end_date" id="end_date" class="form-control" value="{{ old('end_date') }}" required>
-            @error('end_date') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="capacity" class="form-label">Capacidad</label>
-            <input type="number" name="capacity" id="capacity" class="form-control" value="{{ old('capacity') }}" required>
-            @error('capacity') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="location" class="form-label">Ubicación</label>
-            <input type="text" name="location" id="location" class="form-control" value="{{ old('location') }}">
-            @error('location') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Precio</label>
-            <input type="number" name="price" id="price" class="form-control" value="{{ old('price') }}" step="0.01" required>
-            @error('price') <div class="text-danger">{{ $message }}</div> @enderror
-        </div>
+        @include('partials.course-form', ['isEdit' => false])
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a href="{{ route('courses.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>

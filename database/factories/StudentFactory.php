@@ -20,6 +20,7 @@ class StudentFactory extends Factory
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'dni_nie' => $this->faker->unique()->regexify('[A-Z0-9]{8}[A-Z]'), // Ejemplo de DNI/NIE
+            'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
             'birth_date' => $this->faker->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'disability' => $this->faker->boolean(20), // 20% de probabilidad de true

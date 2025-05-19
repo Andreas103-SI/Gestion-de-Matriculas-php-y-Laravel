@@ -58,18 +58,11 @@ class EnrollmentController extends Controller
     }
 
     // Actualiza una matrícula existente en la base de datos
-    public function update(Request $request, Enrollment $enrollment)
-    {
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'course_id' => 'required|exists:courses,id',
-            'enrollment_date' => 'required|date',
-        ]);
-
-        $enrollment->update($validated);
-
-        return redirect()->route('enrollments.index')->with('success', 'Matrícula actualizada con éxito.');
-    }
+    public function update(EnrollmentRequest $request, \App\Models\Enrollment $enrollment)
+{
+    $enrollment->update($request->validated());
+    return redirect()->route('enrollments.index')->with('success', 'Matrícula actualizada con éxito.');
+}
 
     // Elimina una matrícula de la base de datos
     public function destroy(Enrollment $enrollment)

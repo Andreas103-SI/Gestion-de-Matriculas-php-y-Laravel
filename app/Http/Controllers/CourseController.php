@@ -22,22 +22,12 @@ class CourseController extends Controller
     }
 
     // Guarda un nuevo curso en la base de datos
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'capacity' => 'required|integer|min:1',
-            'location' => 'nullable|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
+    public function store(CourseRequest $request)
+{
+    Course::create($request->validated());
 
-        Course::create($validated);
-
-        return redirect()->route('courses.index')->with('success', 'Curso creado con éxito.');
-    }
+    return redirect()->route('courses.index')->with('success', 'Curso creado con éxito.');
+}
 
     // Muestra los detalles de un curso específico
     public function show(Course $course)
