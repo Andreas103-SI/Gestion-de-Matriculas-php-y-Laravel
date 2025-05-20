@@ -7,6 +7,7 @@
             <p><strong>ID:</strong> {{ $student->id }}</p>
             <p><strong>Nombre:</strong> {{ $student->first_name }} {{ $student->last_name }}</p>
             <p><strong>DNI/NIE:</strong> {{ $student->dni_nie }}</p>
+            <p><strong>Correo Electrónico:</strong> {{ $student->email }}</p>
             <p><strong>Teléfono:</strong> {{ $student->phone ?? 'No especificado' }}</p>
             <p><strong>Fecha de Nacimiento:</strong> {{ $student->birth_date }}</p>
             <p><strong>Discapacidad:</strong> {{ $student->disability ? 'Sí' : 'No' }}</p>

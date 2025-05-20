@@ -2,6 +2,7 @@
 
 @section('content')
     <h1 class="mb-4">Estudiantes</h1>
+    @include('partials.search-form')
     <a href="{{ route('students.create') }}" class="btn btn-primary mb-3">Crear Estudiante</a>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -9,6 +10,7 @@
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>DNI/NIE</th>
+                <th>Correo Electrónico</th>
                 <th>Teléfono</th>
                 <th>Fecha de Nacimiento</th>
                 <th>Discapacidad</th>
@@ -22,6 +24,7 @@
                     <td>{{ $student->id }}</td>
                     <td>{{ $student->first_name }} {{ $student->last_name }}</td>
                     <td>{{ $student->dni_nie }}</td>
+                    <td>{{ $student->email }}</td>
                     <td>{{ $student->phone ?? 'N/A' }}</td>
                     <td>{{ $student->birth_date }}</td>
                     <td>{{ $student->disability ? 'Sí' : 'No' }}</td>

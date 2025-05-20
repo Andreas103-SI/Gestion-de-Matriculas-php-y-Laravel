@@ -39,7 +39,9 @@
     <input type="date" name="birth_date" id="birth_date" class="form-control" value="{{ old('birth_date', $isEdit && $model->birth_date ? $model->birth_date->format('Y-m-d') : '') }}" required>
     @error('birth_date') <div class="text-danger">{{ $message }}</div> @enderror
 </div>
-<div class="mb-3">
-    <label for="disability" class="form-label">Discapacidad</label>
-    <input type="text" name="disability" id="disability" class="form-control" value="{{ old('disability', $isEdit ? $model->disability : '') }}" required>
-    @error('disability') <div class="text-danger">{{ $message }}</div> @enderror
+<div class="mb-3 form-check">
+    <input type="checkbox" name="disability" id="disability" class="form-check-input" value="1"
+    {{ old('disability', $isEdit ? $model->disability : false) ? 'checked' : '' }}>
+    <label for="disability" class="form-check-label">¿Tiene Discapacidad?</label>
+    @error('disability') <div class="text-danger">{{ $message}} </div>@enderror
+</div>

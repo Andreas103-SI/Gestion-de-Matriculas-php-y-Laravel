@@ -8,11 +8,18 @@ use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     // Muestra la lista de todos los estudiantes
-    public function index()
-    {
-        $students = Student::all();
-        return view('students.index', compact('students'));
-    }
+    public function index(Request $request)
+{
+    $search = $request->query('search');
+    $students = Student::query()
+        ->when($search, function ($query, $search) {
+            return $query->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+        })
+        ->get();
+    return view('students.index', compact('students'));
+}
 
     // Muestra el formulario para crear un nuevo estudiante
     public function create()
