@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Query\StudentSearch;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -10,14 +11,8 @@ class StudentController extends Controller
     // Muestra la lista de todos los estudiantes
     public function index(Request $request)
 {
-    $search = $request->query('search');
-    $students = Student::query()
-        ->when($search, function ($query, $search) {
-            return $query->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-        })
-        ->get();
+    $filter = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
+    $students = (new StudentSearch($filter))->search()->get();
     return view('students.index', compact('students'));
 }
 
@@ -34,6 +29,7 @@ class StudentController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'dni_nie' => 'required|string|max:9|unique:students,dni_nie',
+            'email' => 'nullable|email|max:255|unique:students,email',
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'required|date',
             'disability' => 'boolean',
@@ -64,6 +60,7 @@ class StudentController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'dni_nie' => 'required|string|max:9|unique:students,dni_nie,' . $student->id,
+            'email' => 'nullable|email|max:255|unique:students,email,' . $student->id,
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'required|date',
             'disability' => 'boolean',
@@ -80,6 +77,29 @@ class StudentController extends Controller
     {
         $student->delete();
         return redirect()->route('students.index')->with('success', 'Estudiante eliminado con éxito.');
+    }
+
+    // Muestra la lista de estudiantes eliminados
+    public function trashed(Request $request)
+    {
+        $filters = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
+        $students = (new StudentSearch($filters))->search()->onlyTrashed()->get();
+        dd($students); // O usa Log::info(json_encode($students));
+        return view('students.trashed', compact('students'));
+    }
+    // Restaura un estudiante eliminado (soft delete)
+    public function restore($id)
+    {
+        $student = Student::withTrashed()->findOrFail($id);
+        $student->restore();
+        return redirect()->route('students.trashed')->with('success', 'Estudiante restaurado con éxito');
+    }
+    // Elimina un estudiante de forma permanente (hard delete)
+    public function forceDelete($id)
+    {
+        $student = Student::withTrashed()->findOrFail($id);
+        $student->forceDelete();
+        return redirect()->route('students.trashed')->with('success', 'Estudiante eliminado definitivamente');
     }
 }
 

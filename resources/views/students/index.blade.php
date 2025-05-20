@@ -2,8 +2,13 @@
 
 @section('content')
     <h1 class="mb-4">Estudiantes</h1>
-    @include('partials.search-form')
+    @include('partials.advanced-search-form')
     <a href="{{ route('students.create') }}" class="btn btn-primary mb-3">Crear Estudiante</a>
+    <a href="{{ route('students.trashed') }}" class="btn btn-info">Ver Eliminados</a>
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
@@ -14,6 +19,7 @@
                 <th>Teléfono</th>
                 <th>Fecha de Nacimiento</th>
                 <th>Discapacidad</th>
+                <th>Dirección</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,7 +34,7 @@
                     <td>{{ $student->phone ?? 'N/A' }}</td>
                     <td>{{ $student->birth_date }}</td>
                     <td>{{ $student->disability ? 'Sí' : 'No' }}</td>
-                    <td>
+                    <td>{{ $student->address ?? 'N/A' }}</td>
                         <!-- Botón para ver detalles del estudiante -->
                         <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info">Ver</a>
                         <!-- Botón para editar estudiante -->
@@ -43,7 +49,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">No hay estudiantes registrados.</td>
+                    <td colspan="9" class="text-center">No hay estudiantes registrados.</td>
                 </tr>
             @endforelse
         </tbody>
