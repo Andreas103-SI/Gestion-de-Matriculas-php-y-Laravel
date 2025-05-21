@@ -13,6 +13,8 @@ Route::post('students/{id}/force-delete', [StudentController::class, 'forceDelet
 Route::resource('students', StudentController::class);
 Route::resource('courses', CourseController::class);
 Route::resource('enrollments', EnrollmentController::class);
+Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+
 
 Route::get('/', function () {
     return view('welcome');

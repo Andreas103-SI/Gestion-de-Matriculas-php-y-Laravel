@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\Course;
+use App\Mail\StudentEnrolled;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+
 
 class EnrollmentController extends Controller
 {
@@ -30,18 +33,30 @@ class EnrollmentController extends Controller
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'course_id' => 'required|exists:courses,id',
-            // 'enrollment_document' ya no se valida porque se genera automáticamente
             'enrollment_date' => 'required|date',
         ]);
 
-        // Generar UUID automáticamente
         $validated['enrollment_document'] = \Illuminate\Support\Str::uuid();
 
-        Enrollment::create($validated);
+        $enrollment = Enrollment::create($validated);
+
+        // Obtener estudiante y curso
+        $student = Student::findOrFail($validated['student_id']);
+        $course = Course::findOrFail($validated['course_id']);
+
+        // Depurar para verificar datos
+        \Log::info('Enviando correo a: ' . $student->email);
+        \Log::info('Curso: ' . $course->name);
+
+        // Enviar correo de confirmación
+        if ($student->email) {
+            \Mail::to($student->email)->send(new \App\Mail\StudentEnrolled($student, $course));
+        } else {
+            \Log::warning('El estudiante no tiene correo electrónico: ' . $student->id);
+        }
 
         return redirect()->route('enrollments.index')->with('success', 'Matrícula creada con éxito.');
     }
-
     // Muestra los detalles de una matrícula específica
     public function show(Enrollment $enrollment)
     {

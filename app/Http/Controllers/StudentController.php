@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Query\StudentSearch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StudentCreated;
 
 class StudentController extends Controller
 {
@@ -36,7 +38,10 @@ class StudentController extends Controller
             'address' => 'nullable|string|max:500',
         ]);
 
-        Student::create($validated);
+        $student = Student::create($validated);
+
+        // Enviar correo de confirmación
+        Mail::to($student->email)->send(new StudentCreated($student));
 
         return redirect()->route('students.index')->with('success', 'Estudiante creado con éxito.');
     }
