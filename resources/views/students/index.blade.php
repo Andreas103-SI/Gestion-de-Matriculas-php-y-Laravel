@@ -42,6 +42,15 @@
                             <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info">Ver</a>
                             <!-- Botón para editar estudiante -->
                             <a href="{{ route('students.edit', $student) }}" class="btn btn-sm btn-warning">Editar</a>
+                            <!-- Botón para subir certificado -->
+                            <a href="{{ route('students.show-upload-certificate', $student) }}" class="btn btn-sm btn-primary">Subir Certificado</a>
+                            <!-- Botón para descargar certificados -->
+                            @foreach ($student->certificates as $certificate)
+                                <a href="{{ route('certificates.download', $certificate->id) }}" class="btn btn-sm btn-success mt-1">
+                                    <i class="bi bi-download me-2"></i>Descargar Certificado
+                                </a>
+                            @endforeach
+
                             <!-- El formulario se envía mediante POST y se especifica el método DELETE -->
                             <form action="{{ route('students.destroy', $student) }}" method="POST" style="display:inline;">
                                 @csrf

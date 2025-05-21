@@ -28,7 +28,7 @@ class Student extends Model
         'birth_date' => 'date',
     ];
 
-    
+
 
     // Ámbitos locales
     public function scopeSearchByFirstName(Builder $query, string $firstName): Builder
@@ -64,5 +64,9 @@ class Student extends Model
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class);
+    }
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
     }
 }

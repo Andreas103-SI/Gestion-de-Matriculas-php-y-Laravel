@@ -7,6 +7,9 @@ use App\Query\StudentSearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCreated;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Certificate;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentController extends Controller
 {
@@ -106,6 +109,54 @@ class StudentController extends Controller
         $student = Student::withTrashed()->findOrFail($id);
         $student->forceDelete();
         return redirect()->route('students.trashed')->with('success', 'Estudiante eliminado definitivamente');
+    }
+
+    // Muestra el formulario para subir un certificado
+    public function showUploadCertificate($studentId)
+    {
+        $student = Student::findOrFail($studentId);
+        return view('students.upload-certificate', compact('student'));
+    }
+
+    // Muestra el formulario para subir un certificado
+    public function uploadCertificate(Request $request, $studentId)
+    {
+        $request->validate([
+            'certificate' => 'required|file|mimes:pdf|max:2048', // Máximo 2MB
+        ]);
+
+        $student = Student::findOrFail($studentId);
+
+        if ($request->hasFile('certificate')) {
+            $file = $request->file('certificate');
+            $fileName = time(). $file->getClientOriginalName();
+            $filePath = $file->storeAs('certificates', $fileName, 'public');
+
+            Certificate::create([
+                'student_id' => $student->id,
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+            ]);
+
+            return redirect()->back()->with('success', 'Certificado subido con éxito.');
+        }
+
+        return redirect()->back()->with('error', 'No se pudo subir el certificado.');
+    }
+
+
+    // Descarga el certificado
+    public function downloadCertificate($certificateId)
+    {
+        $certificate = Certificate::findOrFail($certificateId);
+
+        // Verificar si el archivo existe usando el disco 'public'
+        if (Storage::disk('public')->exists($certificate->file_path)) {
+            $absolutePath = Storage::disk('public')->path($certificate->file_path);
+            return response()->download($absolutePath, $certificate->file_name);
+        }
+
+        return redirect()->back()->with('error', 'El certificado no se encuentra o no está disponible.');
     }
 }
 
