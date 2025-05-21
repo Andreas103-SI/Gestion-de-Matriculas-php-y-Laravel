@@ -32,11 +32,15 @@
                     <td>{{ $student->dni_nie }}</td>
                     <td>{{ $student->email ?? 'Sin correo' }}</td>
                     <td>{{ $student->phone ?? 'Sin teléfono' }}</td>
-                    <td>{{ $student->birth_date->format('d/m/Y') }}</td>
+                    <td>{{ $student->birth_date ? $student->birth_date->format('d/m/Y') : 'Sin fecha' }}</td>
                     <td>{{ $student->disability ? 'Sí' : 'No' }}</td>
                     <td>{{ $student->address ?? 'Sin dirección' }}</td>
-                    <td>{{ $student->deleted_at->format('d/m/Y H:i') }}</td>
+                    <td>{{ $student->deleted_at ? $student->deleted_at->format('d/m/Y H:i') : 'Sin fecha' }}</td>
                     <td>
+                        <div>
+                            <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info">Ver</a>
+                            <a href="{{ route('students.edit', $student) }}" class="btn btn-sm btn-warning">Editar</a>
+                        </div>
                         <form action="{{ route('students.restore', $student) }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('¿Restaurar estudiante?')">Restaurar</button>

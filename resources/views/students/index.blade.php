@@ -8,7 +8,7 @@
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-    
+
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
@@ -25,7 +25,7 @@
         </thead>
         <tbody>
             @forelse ($students as $student)
-            <!-- Recorre todos los estudiantes y muestra sus datos -->
+                <!-- Recorre todos los estudiantes y muestra sus datos -->
                 <tr>
                     <td>{{ $student->id }}</td>
                     <td>{{ $student->first_name }} {{ $student->last_name }}</td>
@@ -35,16 +35,21 @@
                     <td>{{ $student->birth_date }}</td>
                     <td>{{ $student->disability ? 'Sí' : 'No' }}</td>
                     <td>{{ $student->address ?? 'N/A' }}</td>
-                        <!-- Botón para ver detalles del estudiante -->
-                        <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info">Ver</a>
-                        <!-- Botón para editar estudiante -->
-                        <a href="{{ route('students.edit', $student) }}" class="btn btn-sm btn-warning">Editar</a>
-                        <!-- El formulario se envía mediante POST y se especifica el método DELETE -->
-                        <form action="{{ route('students.destroy', $student) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este estudiante?')">Eliminar</button>
-                        </form>
+
+                    <td>
+                        <div class="btn-group" role="group">
+                            <!-- Botón para ver detalles del estudiante -->
+                            <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info">Ver</a>
+                            <!-- Botón para editar estudiante -->
+                            <a href="{{ route('students.edit', $student) }}" class="btn btn-sm btn-warning">Editar</a>
+                            <!-- El formulario se envía mediante POST y se especifica el método DELETE -->
+                            <form action="{{ route('students.destroy', $student) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('¿Estás seguro de eliminar este estudiante?')">Eliminar</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty

@@ -18,26 +18,22 @@ class StudentSearch
 
     public function search(): Builder
     {
-        if (!empty($this->filters['first_name'])) {
-            $this->query->searchByFirstName($this->filters['first_name']);
+        $query = clone $this->query; // Clona la consulta inicial para no modificarla directamente
+        if (isset($this->filters['first_name']) && $this->filters['first_name']) {
+            $query->where('first_name', 'like', '%' . $this->filters['first_name'] . '%');
         }
-
-        if (!empty($this->filters['last_name'])) {
-            $this->query->searchByLastName($this->filters['last_name']);
+        if (isset($this->filters['last_name']) && $this->filters['last_name']) {
+            $query->where('last_name', 'like', '%' . $this->filters['last_name'] . '%');
         }
-
-        if (!empty($this->filters['email'])) {
-            $this->query->searchByEmail($this->filters['email']);
+        if (isset($this->filters['email']) && $this->filters['email']) {
+            $query->where('email', 'like', '%' . $this->filters['email'] . '%');
         }
-
-        if (!empty($this->filters['dni_nie'])) {
-            $this->query->searchByDniNie($this->filters['dni_nie']);
+        if (isset($this->filters['dni_nie']) && $this->filters['dni_nie']) {
+            $query->where('dni_nie', 'like', '%' . $this->filters['dni_nie'] . '%');
         }
-
-        if (isset($this->filters['disability'])) {
-            $this->query->hasDisability(filter_var($this->filters['disability'], FILTER_VALIDATE_BOOLEAN));
+        if (isset($this->filters['disability']) && $this->filters['disability'] !== null) {
+            $query->where('disability', filter_var($this->filters['disability'], FILTER_VALIDATE_BOOLEAN));
         }
-
-        return $this->query;
+        return $query;
     }
 }

@@ -84,9 +84,10 @@ class StudentController extends Controller
     {
         $filters = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
         $students = (new StudentSearch($filters))->search()->onlyTrashed()->get();
-        dd($students); // O usa Log::info(json_encode($students));
+        //dd($students); // Para verificar
         return view('students.trashed', compact('students'));
     }
+
     // Restaura un estudiante eliminado (soft delete)
     public function restore($id)
     {

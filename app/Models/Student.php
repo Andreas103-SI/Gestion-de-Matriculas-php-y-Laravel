@@ -28,6 +28,8 @@ class Student extends Model
         'birth_date' => 'date',
     ];
 
+    
+
     // Ámbitos locales
     public function scopeSearchByFirstName(Builder $query, string $firstName): Builder
     {
@@ -52,18 +54,6 @@ class Student extends Model
     public function scopeHasDisability(Builder $query, bool $disability): Builder
     {
         return $query->where('disability', $disability);
-    }
-
-    // Ámbito global para incluir/excluir soft deletes
-    protected static function booted()
-    {
-        // Solo incluir registros que no han sido eliminados
-        // (soft delete) por defecto
-        // Puedes cambiar esto a 'whereNotNull'
-        // Puedes desactivarlo con Student::withTrashed()
-        static::addGlobalScope('active', function (Builder $builder) {
-            $builder->whereNull('deleted_at');
-        });
     }
 
     public function courses()
