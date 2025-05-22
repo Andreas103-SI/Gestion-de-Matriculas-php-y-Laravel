@@ -21,6 +21,7 @@ class Student extends Model
         'birth_date',
         'disability',
         'address',
+        'document_image_path',
     ];
 
     protected $casts = [

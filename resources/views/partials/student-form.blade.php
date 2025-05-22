@@ -45,3 +45,20 @@
     <label for="disability" class="form-check-label">¿Tiene Discapacidad?</label>
     @error('disability') <div class="text-danger">{{ $message}} </div>@enderror
 </div>
+<div class="mb-3">
+    <label for="document_image" class="form-label">
+        <i class="bi bi-image-fill me-2"></i>Imagen del Documento (JPEG/JPG, máximo 2MB)
+    </label>
+    <input type="file" name="document_image" id="document_image" class="form-control" accept=".jpeg,.jpg">
+    @if ($isEdit && $model && $model->document_image_path)
+        <div class="mt-2">
+            <p>Imagen actual:</p>
+            <img src="{{ asset('storage/' . $model->document_image_path) }}" alt="Imagen del Documento" style="max-width: 150px; height: auto;" class="img-thumbnail">
+        </div>
+    @endif
+    @error('document_image')
+        <span class="text-danger">{{ $message }}</span>
+    @enderror
+</div>
+
+

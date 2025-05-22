@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\Course;
-use App\Mail\StudentEnrolled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\EnrollmentRequest;
 
 
 class EnrollmentController extends Controller
@@ -45,14 +46,14 @@ class EnrollmentController extends Controller
         $course = Course::findOrFail($validated['course_id']);
 
         // Depurar para verificar datos
-        \Log::info('Enviando correo a: ' . $student->email);
-        \Log::info('Curso: ' . $course->name);
+        Log::info('Enviando correo a: ' . $student->email);
+        Log::info('Curso: ' . $course->name);
 
         // Enviar correo de confirmación
         if ($student->email) {
-            \Mail::to($student->email)->send(new \App\Mail\StudentEnrolled($student, $course));
+            Mail::to($student->email)->send(new \App\Mail\StudentEnrolled($student, $course));
         } else {
-            \Log::warning('El estudiante no tiene correo electrónico: ' . $student->id);
+            Log::warning('El estudiante no tiene correo electrónico: ' . $student->id);
         }
 
         return redirect()->route('enrollments.index')->with('success', 'Matrícula creada con éxito.');

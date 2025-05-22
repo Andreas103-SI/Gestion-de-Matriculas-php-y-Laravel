@@ -9,17 +9,16 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentCreated;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Certificate;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentController extends Controller
 {
     // Muestra la lista de todos los estudiantes
     public function index(Request $request)
-{
-    $filter = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
-    $students = (new StudentSearch($filter))->search()->get();
-    return view('students.index', compact('students'));
-}
+    {
+        $filter = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
+        $students = (new StudentSearch($filter))->search()->get();
+        return view('students.index', compact('students'));
+    }
 
     // Muestra el formulario para crear un nuevo estudiante
     public function create()
@@ -43,8 +42,26 @@ class StudentController extends Controller
 
         $student = Student::create($validated);
 
-        // Enviar correo de confirmación
-        Mail::to($student->email)->send(new StudentCreated($student));
+        // Subir imagen solo si se proporciona un archivo
+        if ($request->hasFile('document_image')) {
+            $request->validate([
+                'document_image' => 'image|mimes:jpeg,jpg,png|max:2048',
+            ]);
+            $file = $request->file('document_image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('document_images', $fileName, 'public');
+            $student->update(['document_image_path' => $filePath]);
+        }
+
+        // Enviar correo de confirmación solo si hay email
+        if ($student->email) {
+            try {
+                Mail::to($student->email)->send(new StudentCreated($student));
+            } catch (\Exception $e) {
+                // No logueamos para mantener el controlador limpio, pero puedes usar dd si necesitas depurar
+                // dd($e->getMessage());
+            }
+        }
 
         return redirect()->route('students.index')->with('success', 'Estudiante creado con éxito.');
     }
@@ -62,37 +79,74 @@ class StudentController extends Controller
     }
 
     // Actualiza un estudiante existente en la base de datos
+
     public function update(Request $request, Student $student)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'dni_nie' => 'required|string|max:9|unique:students,dni_nie,' . $student->id,
-            'email' => 'nullable|email|max:255|unique:students,email,' . $student->id,
-            'phone' => 'nullable|string|max:20',
-            'birth_date' => 'required|date',
-            'disability' => 'boolean',
-            'address' => 'nullable|string|max:500',
-        ]);
+        try {
+            $validated = $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'dni_nie' => 'required|string|max:9|unique:students,dni_nie,' . $student->id,
+                'email' => 'nullable|email|max:255|unique:students,email,' . $student->id,
+                'phone' => 'nullable|string|max:20',
+                'birth_date' => 'required|date',
+                'disability' => 'boolean',
+                'address' => 'nullable|string|max:500',
+                'document_image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            ]);
 
-        $student->update($validated);
+            $student->update($validated);
 
-        return redirect()->route('students.index')->with('success', 'Estudiante actualizado con éxito.');
+            // Si hay nueva imagen, la sube y actualiza la ruta
+            if ($request->hasFile('document_image')) {
+                $oldImagePath = $student->getOriginal('document_image_path');
+
+                $file = $request->file('document_image');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+
+                $filePath = $file->storeAs('document_images', $fileName, 'public');
+                if ($filePath === false) {
+                    dd('Error al guardar la imagen en storage. Verifica permisos o configuración.');
+                }
+                dd($filePath); // Depuración: verifica la ruta guardada
+
+                $student->update(['document_image_path' => $filePath]);
+
+                // Elimina la imagen anterior si existe y es diferente
+                if ($oldImagePath && Storage::disk('public')->exists($oldImagePath) && $oldImagePath !== $filePath) {
+                    $deleted = Storage::disk('public')->delete($oldImagePath);
+                    if (!$deleted) {
+                        dd("No se pudo eliminar la imagen: $oldImagePath");
+                    }
+                }
+            }
+
+            // Envía correo si hay email
+            if ($student->email) {
+                try {
+                    Mail::to($student->email)->send(new StudentCreated($student));
+                } catch (\Exception $e) {
+                    dd($e->getMessage());
+                }
+            }
+
+            return redirect()->route('students.index')->with('success', 'Estudiante actualizado con éxito.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al actualizar el estudiante: ' . $e->getMessage());
+        }
     }
+// Elimina un estudiante de la base de datos (soft delete)
+public function destroy(Student $student)
+{
+    $student->delete();
+    return redirect()->route('students.index')->with('success', 'Estudiante eliminado con éxito.');
+}
 
-    // Elimina un estudiante de la base de datos
-    public function destroy(Student $student)
-    {
-        $student->delete();
-        return redirect()->route('students.index')->with('success', 'Estudiante eliminado con éxito.');
-    }
-
-    // Muestra la lista de estudiantes eliminados
-    public function trashed(Request $request)
-    {
+// Muestra la lista de estudiantes eliminados
+public function trashed(Request $request)
+{
         $filters = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
         $students = (new StudentSearch($filters))->search()->onlyTrashed()->get();
-        //dd($students); // Para verificar
         return view('students.trashed', compact('students'));
     }
 
@@ -101,14 +155,37 @@ class StudentController extends Controller
     {
         $student = Student::withTrashed()->findOrFail($id);
         $student->restore();
-        return redirect()->route('students.trashed')->with('success', 'Estudiante restaurado con éxito');
+
+        // Verificar si la imagen sigue existiendo; si no, resetear document_image_path
+        if ($student->document_image_path && !Storage::disk('public')->exists($student->document_image_path)) {
+            $student->update(['document_image_path' => null]);
+        }
+
+        return redirect()->route('students.trashed')->with('success', 'Estudiante restaurado con éxito.');
     }
+
     // Elimina un estudiante de forma permanente (hard delete)
-    public function forceDelete($id)
+    public function forceDelete(Student $student)
     {
-        $student = Student::withTrashed()->findOrFail($id);
-        $student->forceDelete();
-        return redirect()->route('students.trashed')->with('success', 'Estudiante eliminado definitivamente');
+        try {
+            $student = Student::withTrashed()->findOrFail($student->id);
+            $imagePath = $student->document_image_path;
+
+            $student->forceDelete();
+
+            // Eliminar la imagen asociada si existe
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                $deleted = Storage::disk('public')->delete($imagePath);
+                if (!$deleted) {
+                    // Usar dd para depurar si la imagen no se elimina
+                    // dd("No se pudo eliminar la imagen: $imagePath");
+                }
+            }
+
+            return redirect()->route('students.trashed')->with('success', 'Estudiante eliminado definitivamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al eliminar definitivamente: ' . $e->getMessage());
+        }
     }
 
     // Muestra el formulario para subir un certificado
@@ -118,7 +195,7 @@ class StudentController extends Controller
         return view('students.upload-certificate', compact('student'));
     }
 
-    // Muestra el formulario para subir un certificado
+    // Sube un certificado
     public function uploadCertificate(Request $request, $studentId)
     {
         $request->validate([
@@ -129,7 +206,7 @@ class StudentController extends Controller
 
         if ($request->hasFile('certificate')) {
             $file = $request->file('certificate');
-            $fileName = time(). $file->getClientOriginalName();
+            $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('certificates', $fileName, 'public');
 
             Certificate::create([
@@ -144,13 +221,11 @@ class StudentController extends Controller
         return redirect()->back()->with('error', 'No se pudo subir el certificado.');
     }
 
-
     // Descarga el certificado
     public function downloadCertificate($certificateId)
     {
         $certificate = Certificate::findOrFail($certificateId);
 
-        // Verificar si el archivo existe usando el disco 'public'
         if (Storage::disk('public')->exists($certificate->file_path)) {
             $absolutePath = Storage::disk('public')->path($certificate->file_path);
             return response()->download($absolutePath, $certificate->file_name);
@@ -159,5 +234,3 @@ class StudentController extends Controller
         return redirect()->back()->with('error', 'El certificado no se encuentra o no está disponible.');
     }
 }
-
-

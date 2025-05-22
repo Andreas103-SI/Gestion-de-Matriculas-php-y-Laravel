@@ -1,21 +1,67 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">Detalles del Estudiante</h1>
-    <div class="card">
-        <div class="card-body">
-            <p><strong>ID:</strong> {{ $student->id }}</p>
-            <p><strong>Nombre:</strong> {{ $student->first_name }} {{ $student->last_name }}</p>
-            <p><strong>DNI/NIE:</strong> {{ $student->dni_nie }}</p>
-            <p><strong>Correo Electrónico:</strong> {{ $student->email }}</p>
-            <p><strong>Teléfono:</strong> {{ $student->phone ?? 'No especificado' }}</p>
-            <p><strong>Fecha de Nacimiento:</strong> {{ $student->birth_date }}</p>
-            <p><strong>Discapacidad:</strong> {{ $student->disability ? 'Sí' : 'No' }}</p>
-            <p><strong>Dirección:</strong> {{ $student->address ?? 'No especificada' }}</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Detalles del Estudiante</h2>
+                    </div>
+                    <div class="card-body">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <strong>Nombre:</strong> {{ $student->first_name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Apellidos:</strong> {{ $student->last_name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>DNI/NIE:</strong> {{ $student->dni_nie }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Correo Electrónico:</strong> {{ $student->email ?? 'No proporcionado' }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Teléfono:</strong> {{ $student->phone ?? 'No proporcionado' }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Fecha de Nacimiento:</strong> {{ $student->birth_date }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Discapacidad:</strong> {{ $student->disability ? 'Sí' : 'No' }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Dirección:</strong> {{ $student->address ?? 'No proporcionada' }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Imagen del Documento:</strong>
+                            @if ($student->document_image_path)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $student->document_image_path) }}" alt="Imagen del Documento" style="max-width: 150px; height: auto;" class="img-thumbnail">
+                                </div>
+                            @else
+                                <p>No hay imagen disponible.</p>
+                            @endif
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('students.edit', $student) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </a>
+                            <a href="{{ route('students.index') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="mt-3">
-        <a href="{{ route('students.edit', $student) }}" class="btn btn-warning">Editar</a>
-        <a href="{{ route('students.index') }}" class="btn btn-secondary">Volver</a>
     </div>
 @endsection
