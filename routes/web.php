@@ -28,7 +28,7 @@ Route::get('certificates/{certificate}/download', [StudentController::class, 'do
 Route::post('students/{id}/force-delete', [StudentController::class, 'forceDelete'])->name('students.forceDelete');
 
 
-
+Route::get('students/{student}/pdf', [StudentController::class, 'generatePdf'])->name('students.pdf');
 
 
 Route::resource('courses', CourseController::class);

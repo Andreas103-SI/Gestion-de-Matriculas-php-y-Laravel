@@ -58,6 +58,9 @@
                             <a href="{{ route('students.index') }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>Volver
                             </a>
+                            <a href="{{ route('students.pdf', $student) }}" class="btn btn-success" target="_blank">
+                                <i class="bi bi-file-earmark-pdf me-2"></i>Descargar PDF
+                            </a>
                         </div>
                     </div>
                 </div>
