@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\StudentController;
@@ -21,21 +20,17 @@ Route::get('students/{student}/upload-certificate', [StudentController::class, '
 Route::post('students/{student}/upload-certificate', [StudentController::class, 'uploadCertificate'])->name('students.upload-certificate');
 // Ruta GET para descargar el certificado
 Route::get('certificates/{certificate}/download', [StudentController::class, 'downloadCertificate'])->name('certificates.download');
-
-
-
+// Ruta GET para descargar el zip de certificados e imagenes si las hay
+Route::get('students/{student}/download-certificates', [StudentController::class, 'generateZip'])->name('students.download-certificates');
 
 Route::post('students/{id}/force-delete', [StudentController::class, 'forceDelete'])->name('students.forceDelete');
 
-
 Route::get('students/{student}/pdf', [StudentController::class, 'generatePdf'])->name('students.pdf');
-
 
 Route::resource('courses', CourseController::class);
 
 Route::resource('enrollments', EnrollmentController::class);
 Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
-
 
 Route::get('/', function () {
     return view('welcome');

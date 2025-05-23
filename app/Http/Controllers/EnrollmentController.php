@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\EnrollmentRequest;
+use ZipArchive;
 
 
 class EnrollmentController extends Controller
