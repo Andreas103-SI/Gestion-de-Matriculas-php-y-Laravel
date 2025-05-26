@@ -13,16 +13,31 @@ use App\Models\Student;
 class StudentCreated extends Mailable
 {
 
-    public function __construct(Student $student)
+    use Queueable, SerializesModels;
+
+    public $student;
+    public $zipPath;
+
+    public function __construct($student, $zipPath = null)
     {
         $this->student = $student;
+        $this->zipPath = $zipPath;
     }
 
     public function build ()
     {
-        return $this->view('emails.student-created')
-            ->with('student', $this->student)
-            ->subject('Confirmación de Registro de Estudiante');
+        $mail = $this->subject('Notificación de Inscripción')
+                     ->view('emails.sendEmails');
+
+
+        if ($this->zipPath !== null && file_exists($this->zipPath)) {
+            $mail->attach($this->zipPath, [
+                'as' => 'documentos_estudiante_' . $this->student->id . '.zip',
+                'mime' => 'application/zip',
+            ]);
+        }
+
+        return $mail;
     }
 
 }

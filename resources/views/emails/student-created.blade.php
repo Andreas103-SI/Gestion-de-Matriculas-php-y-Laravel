@@ -10,5 +10,6 @@
     <p><strong>DNI/NIE:</strong> {{ $student->dni_nie }}</p>
     <p><strong>Correo:</strong> {{ $student->email }}</p>
     <p>Si tienes alguna duda, contáctanos.</p>
+
 </body>
 </html>
