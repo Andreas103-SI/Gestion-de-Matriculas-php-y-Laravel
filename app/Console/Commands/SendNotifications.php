@@ -15,7 +15,7 @@ class SendNotifications extends Command
     // Nombre y firma del comando
     protected $signature = 'notifications:send';
     // Descripción del comando
-    protected $description = 'Enviar notificaciones por correo electrónico a los estudiantes';
+    protected $description = 'Enviar email a los estudiantes';
 
     public function handle()
     {
