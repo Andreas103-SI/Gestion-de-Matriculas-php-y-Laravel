@@ -50,13 +50,6 @@ class SendNotifications extends Command
         $this->info('Notificaciones por correo enviadas exitosamente a todos los estudiantes inscritos ayer.');
     }
 
-    /**
-     * Genera un ZIP con los certificados y la imagen del documento del estudiante.
-     * Si no hay certificados, se genera un PDF con la información del estudiante y se adjunta.
-     *
-     * @param  \App\Models\Student  $student
-     * @return string|null  Ruta del ZIP generado o null en caso de error.
-     */
     private function generateZipForStudent($student)
     {
         $zip = new ZipArchive();

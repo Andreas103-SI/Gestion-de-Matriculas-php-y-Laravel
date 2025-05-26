@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        // Puedes agregar tareas programadas aquí
+        $schedule->command('notifications:send')->dailyAt('08:00');
     }
 
     protected function commands(): void

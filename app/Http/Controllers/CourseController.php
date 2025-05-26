@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CourseRequest;
 
 class CourseController extends Controller
 {
     // Muestra la lista de todos los cursos
-    public function index()
+    public function index(Request $request)
     {
         $courses = Course::all();
         return view('courses.index', compact('courses'));

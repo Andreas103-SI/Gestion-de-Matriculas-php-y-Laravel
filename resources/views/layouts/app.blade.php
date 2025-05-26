@@ -24,6 +24,15 @@
                     <a class="nav-link" href="{{ route('students.index') }}">Estudiantes</a>
                     <a class="nav-link" href="{{ route('courses.index') }}">Cursos</a>
                     <a class="nav-link" href="{{ route('enrollments.index') }}">Matrículas</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+
+                            <x-dropdown-link :href="route('logout')"
+                                    onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </x-dropdown-link>
+                        </form>
                 </div>
             </div>
         </nav>
