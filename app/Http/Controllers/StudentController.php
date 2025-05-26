@@ -271,21 +271,12 @@ class StudentController extends Controller
     // Genera un ZIP de certificados y de imagenes si las hay
     public function generateZip(Student $student)
     {
-
         $zip = new \ZipArchive();
-        $zipDir = storage_path('app/public/zips');
-        $zipFileName = 'documentos_estudiante_' . $student->id . '.zip';
-        $zipFilePath = $zipDir . '/' . $zipFileName;
-
-        // Asegura que la carpeta zips existe
-        if (!is_dir($zipDir)) {
-            mkdir($zipDir, 0775, true);
-        }
-
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'student_zip_');
         $addCertificates = false;
 
-        if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            // 1. Agregar certificados PDF asociados
+        if ($zip->open($tempZipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+
             foreach ($student->certificates as $certificate) {
                 $filePath = storage_path('app/public/' . $certificate->file_path);
                 if (file_exists($filePath)) {
@@ -294,7 +285,6 @@ class StudentController extends Controller
                 }
             }
 
-            // 2. Si NO hay certificados, genera el PDF automáticamente
             if (!$addCertificates) {
                 $fields = [
                     'first_name' => $student->first_name,
@@ -306,25 +296,30 @@ class StudentController extends Controller
                     'disability' => $student->disability ? 'Sí' : 'No',
                     'address' => $student->address,
                 ];
-                $pdf = Pdf::loadView('students.pdf', compact('fields'));  // Quitamos el \ innecesario
-                $pdfFileName = 'certificado_' . $student->id . '.pdf';
-                $pdfTempPath = $zipDir . '/' . $pdfFileName;
-                file_put_contents($pdfTempPath, $pdf->output());
-                $zip->addFile($pdfTempPath, 'certificados/' . $pdfFileName);
+
+                $pdf = Pdf::loadView('students.pdf', compact('fields'));
+                $pdfContent = $pdf->output();
+                $pdfTempPath = tempnam(sys_get_temp_dir(), 'student_pdf_');
+                file_put_contents($pdfTempPath, $pdfContent);
+                $zip->addFile($pdfTempPath, 'certificados/certificado_estudiante_' . $student->id . '.pdf');
+                $addCertificates = true;
             }
 
-            // 3. Imagen del documento (si existe)
-            if ($student->document_image_path && Storage::disk('public')->exists($student->document_image_path)) {  // Quitamos el \ de \Storage
+            if ($student->document_image_path && Storage::disk('public')->exists($student->document_image_path)) {
                 $imagePath = storage_path('app/public/' . $student->document_image_path);
                 $zip->addFile($imagePath, 'imagenes/' . basename($imagePath));
             }
 
             $zip->close();
 
-            return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            if (!$addCertificates) {
+                return response()->json(['error' => 'No se encontraron archivos para incluir en el ZIP.'], 500);
+            }
+
+            return response()->download($tempZipPath, 'documentos_estudiante_' . $student->id . '.zip')->deleteFileAfterSend(true);
         }
 
-        return redirect()->back()->with('error', 'No se pudo crear el archivo ZIP.');
+        return response()->json(['error' => 'No se pudo crear el archivo ZIP.'], 500);
     }
 
 }

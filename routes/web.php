@@ -6,40 +6,69 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
-Route::get('students/trashed', [StudentController::class, 'trashed'])->name('students.trashed');
-Route::post('students/{id}/restore', [StudentController::class, 'restore'])->name('students.restore');
-Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
-Route::resource('students', StudentController::class);
-// Ruta GET para mostrar el formulario
-Route::get('students/{student}/upload-certificate', [StudentController::class, 'showUploadCertificate'])->name('students.show-upload-certificate');
-// Ruta POST para procesar la subida
-Route::post('students/{student}/upload-certificate', [StudentController::class, 'uploadCertificate'])->name('students.upload-certificate');
-// Ruta GET para descargar el certificado
-Route::get('certificates/{certificate}/download', [StudentController::class, 'downloadCertificate'])->name('certificates.download');
-// Ruta GET para descargar el zip de certificados e imagenes si las hay
-Route::get('students/{student}/download-certificates', [StudentController::class, 'generateZip'])->name('students.download-certificates');
-
-Route::post('students/{id}/force-delete', [StudentController::class, 'forceDelete'])->name('students.forceDelete');
-
-Route::get('students/{student}/pdf', [StudentController::class, 'generatePdf'])->name('students.pdf');
-
-Route::resource('courses', CourseController::class);
-
-Route::resource('enrollments', EnrollmentController::class);
-Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
-
+/*
+|--------------------------------------------------------------------------
+| Página principal
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard (autenticado)
+|--------------------------------------------------------------------------
+*/
+Route::get('dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Rutas autenticadas
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Perfil de usuario
+    |--------------------------------------------------------------------------
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Estudiantes
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('students', StudentController::class);
+
+    Route::get('students/trashed', [StudentController::class, 'trashed'])->name('students.trashed');
+    Route::post('students/{id}/restore', [StudentController::class, 'restore'])->name('students.restore');
+    Route::post('students/{id}/force-delete', [StudentController::class, 'forceDelete'])->name('students.forceDelete');
+
+    // PDF y ZIP
+    Route::get('students/{student}/pdf', [StudentController::class, 'generatePdf'])->name('students.pdf');
+    Route::get('students/{student}/preview-pdf', [StudentController::class, 'previewPdf'])->name('students.preview-pdf');
+    Route::get('students/{student}/generate-zip', [StudentController::class, 'generateZip'])->name('students.generate-zip');
+
+    // Certificados
+    Route::get('students/{student}/upload-certificate', [StudentController::class, 'showUploadCertificate'])->name('students.show-upload-certificate');
+    Route::post('students/{student}/upload-certificate', [StudentController::class, 'uploadCertificate'])->name('students.upload-certificate');
+    Route::get('certificates/{certificate}/download', [StudentController::class, 'downloadCertificate'])->name('certificates.download');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cursos y Matrículas
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('courses', CourseController::class);
+    Route::resource('enrollments', EnrollmentController::class);
+    Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
 });
 
 require __DIR__.'/auth.php';

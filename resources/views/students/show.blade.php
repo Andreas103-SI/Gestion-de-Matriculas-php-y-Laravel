@@ -61,8 +61,8 @@
                             <a href="{{ route('students.pdf', $student) }}" class="btn btn-success" target="_blank">
                                 <i class="bi bi-file-earmark-pdf me-2"></i>Descargar PDF
                             </a>
-                            <a href="{{ route('students.download-certificates', $student) }}" class="btn btn-info" target="_blank">
-                                <i class="bi bi-file-earmark-zip me-2"></i>Descargar ZIP
+                            <a href="{{ route('students.generate-zip', $student) }}" class="btn btn-primary">
+                                <i class="bi bi-download me-2"></i>Descargar Certificados
                             </a>
                         </div>
                     </div>
