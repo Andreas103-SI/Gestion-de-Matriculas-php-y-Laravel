@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Certificate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Ramsey\Uuid\Nonstandard\Fields;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
