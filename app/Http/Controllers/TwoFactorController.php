@@ -30,6 +30,7 @@ public function store(Request $request): ValidationException|RedirectResponse
             throw ValidationException::withMessages(['two_factor_code' => __("El codigo no es valido ")]);
         }
 
+        //Resetea el codigo 2FA
         $user->resetTwoFactorCode();
         return redirect()->to('/');
     }

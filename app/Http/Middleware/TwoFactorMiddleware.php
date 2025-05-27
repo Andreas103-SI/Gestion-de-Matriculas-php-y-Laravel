@@ -9,27 +9,30 @@ use Symfony\Component\HttpFoundation\Response;
 class TwoFactorMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Handle an incoming request and enforce two-factor authentication if enabled.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request  // La solicitud HTTP entrante
+     * @param  \Closure  $next  // El siguiente middleware en la pila
+     * @return \Symfony\Component\HttpFoundation\Response  // La respuesta procesada
      */
     public function handle(Request $request, Closure $next)
     {
-        $user = auth()->user();
-        if (auth()->check() && $user->two_factor_code) {
+        // Verifica si la autenticación de dos factores está habilitada en la configuración
 
-            if ($user->two_factor_expires_at < now()) {
+            $user = auth()->user();
+            if (auth()->check() && $user->two_factor_code) {
                 // Si el código ha expirado, lo reseteamos
-                $user->resetTwoFactorCode();
-                auth()->logout(); // Cierra la sesión del usuario
-                // Redirige al usuario a la página de verificación con un mensaje de error
-                return redirect()->route('verify.index')->with('error', 'Your verification code expired. Please re-login.');
+                if ($user->two_factor_expires_at < now()) {
+                    $user->resetTwoFactorCode();
+                    auth()->logout(); // Cierra la sesión del usuario
+                    return redirect()->route('verify.index')->with('error', 'Your verification code expired. Please re-login.');
+                }
+                if (!$request->is('verify*')) {
+                    // Si el usuario no está en la página de verificación, lo redirigimos allí
+                    return redirect()->route('verify.index');
+                }
             }
-            if (!$request->is('verify*')) {
-                // Si el usuario no está en la página de verificación, lo redirigimos allí
-                return redirect()->route('verify.index');
-            }
-        }
+
         return $next($request);
     }
 }
