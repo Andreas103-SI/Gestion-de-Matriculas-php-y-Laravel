@@ -4,14 +4,13 @@ namespace App\Observers;
 
 use App\Models\Student;
 use App\Models\StudentLog;
+use App\Enums\StudentAction;
 use App\Traits\NormalizeName;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 
 class StudentObserver
 {
-
     use NormalizeName;
 
     public function saving(Student $student): void
@@ -22,71 +21,64 @@ class StudentObserver
 
     public function created(Student $student): void
     {
-        $userId = Auth::id() ?? 1; // Usa ID 1 como fallback si no hay usuario autenticado (por ejemplo, en pruebas)
+        $userId = Auth::id() ?? 1;
 
         StudentLog::create([
             'user_id' => $userId,
             'student_id' => $student->id,
-            'action' => 'created',
+            'action' => StudentAction::Created, // Usar el enum
         ]);
 
         Log::info("Estudiante creado con nombre: {$student->first_name} {$student->last_name} por usuario ID: {$userId}");
     }
 
-
     public function updated(Student $student): void
     {
-        $userId = Auth::id() ?? 1; // Usa ID 1 como fallback si no hay usuario autenticado (por ejemplo, en pruebas)
+        $userId = Auth::id() ?? 1;
 
         StudentLog::create([
             'user_id' => $userId,
             'student_id' => $student->id,
-            'action' => 'updated',
+            'action' => StudentAction::Updated, // Usar el enum
         ]);
 
         Log::info("Estudiante actualizado con nombre: {$student->first_name} {$student->last_name} por usuario ID: {$userId}");
     }
 
-    /**
-     * Handle the Student "deleted" event.
-     */
     public function deleted(Student $student): void
     {
-        $userId = Auth::id() ?? 1; // Usa ID 1 como fallback si no hay usuario autenticado (por ejemplo, en pruebas)
+        $userId = Auth::id() ?? 1;
 
         StudentLog::create([
             'user_id' => $userId,
             'student_id' => $student->id,
-            'action' => 'deleted',
+            'action' => StudentAction::Deleted, // Usar el enum
         ]);
 
         Log::info("Estudiante eliminado con nombre: {$student->first_name} {$student->last_name} por usuario ID: {$userId}");
     }
 
-
     public function restored(Student $student): void
     {
-        $userId = Auth::id() ?? 1; // Usa ID 1 como fallback si no hay usuario autenticado (por ejemplo, en pruebas)
+        $userId = Auth::id() ?? 1;
 
         StudentLog::create([
             'user_id' => $userId,
             'student_id' => $student->id,
-            'action' => 'restored',
+            'action' => StudentAction::Restored, // Usar el enum
         ]);
 
         Log::info("Estudiante restaurado con nombre: {$student->first_name} {$student->last_name} por usuario ID: {$userId}");
-        $userId = $userId ?? 1; // Usa ID 1 como fallback si no hay usuario autenticado (por ejemplo, en pruebas)
     }
-
 
     public function forceDeleted(Student $student): void
     {
-        $userId =Auth::id() ?? 1;
+        $userId = Auth::id() ?? 1;
 
         StudentLog::create([
             'user_id' => $userId,
             'student_id' => $student->id,
-            'action' => 'force_deleted',
+            'action' => StudentAction::ForceDeleted, // Usar el enum
         ]);
     }
 }

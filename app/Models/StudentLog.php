@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\StudentAction;
 
 class StudentLog extends Model
 {
@@ -10,21 +11,16 @@ class StudentLog extends Model
         'user_id', 'student_id', 'action',
     ];
 
-    /**
-     * Relación con el usuario que realizó la acción.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
+    protected $casts = [
+        'action' => StudentAction::class, // Convierte el valor de la base de datos al enum StudentAction.
+    ];
+
+     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relación con el estudiante afectado.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+
     public function student()
     {
         return $this->belongsTo(Student::class);
