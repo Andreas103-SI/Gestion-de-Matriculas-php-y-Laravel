@@ -76,6 +76,11 @@ Route::middleware(['auth', 'twofactor'])->group(function () {
     Route::resource('courses', CourseController::class);
     Route::resource('enrollments', EnrollmentController::class);
     Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+
+
+
+
 });
 
 require __DIR__.'/auth.php';
+
