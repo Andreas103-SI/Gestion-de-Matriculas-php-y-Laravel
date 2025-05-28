@@ -323,28 +323,31 @@ class StudentController extends Controller
         return response()->json(['error' => 'No se pudo crear el archivo ZIP.'], 500);
     }
 
-    public function indexXml(Request $request)// Exporta los estudiantes a XML
+
+    public function indexXml()
     {
-        dd('Ruta indexXml alcanzada');
-        // $perPage = $request->input('per_page', 10);
-        // $students = Student::paginate($perPage);
+        $students = Student::all(); // Obtiene todos los estudiantes
 
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><students></students>');
+
         foreach ($students as $student) {
             $studentNode = $xml->addChild('student');
+            // Se añaden los campos del estudiante al nodo XML
             $studentNode->addChild('id', $student->id);
-            $studentNode->addChild('name', $student->first_name . ' ' . $student->last_name);
-            $studentNode->addChild('email', $student->email);
+            $studentNode->addChild('first_name', $student->first_name);
+            $studentNode->addChild('last_name', $student->last_name);
+            $studentNode->addChild('email', $student->email ?? '');
             $studentNode->addChild('dni_nie', $student->dni_nie);
-            $studentNode->addChild('phone', $student->phone);
-            $studentNode->addChild('birth_date', $student->birth_date->toDateString());
+            $studentNode->addChild('phone', $student->phone ?? '');
+            $studentNode->addChild('birth_date', $student->birth_date);
             $studentNode->addChild('disability', $student->disability ? 'true' : 'false');
-            $studentNode->addChild('address', $student->address);
-            $studentNode->addChild('created_at', $student->created_at->toDateTimeString());
-            $studentNode->addChild('updated_at', $student->updated_at->toDateTimeString());
+            $studentNode->addChild('address', $student->address ?? '');
         }
 
-        return response($xml->asXML(), 200, ['Content-Type' => 'application/xml']);
+        return response($xml->asXML())
+
+            ->header('Content-Type', 'application/xml')// Define el tipo de contenido como XML
+            ->header('Content-Disposition', 'attachment; filename=estudiantes.xml');// Forzar la descarga del archivo XML
     }
 
 

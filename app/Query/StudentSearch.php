@@ -12,7 +12,8 @@ class StudentSearch
 
     public function __construct(array $filters = [])
     {
-        $this->query = Student::query();
+        Student::query()
+                ->ofType();
         $this->filters = $filters;
     }
 
