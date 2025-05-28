@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\Controller;
 use App\Notifications\SendTwoFactorCode;

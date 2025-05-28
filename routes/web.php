@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Middleware\TwoFactorMiddleware;
+use App\Http\Controllers\FileXmlController;
 
 
 /*
@@ -52,7 +53,7 @@ Route::middleware(['auth', 'twofactor'])->group(function () {
     | Estudiantes
     |--------------------------------------------------------------------------
     */
-    Route::resource('students', StudentController::class);
+
 
     Route::get('students/trashed', [StudentController::class, 'trashed'])->name('students.trashed');
     Route::post('students/{id}/restore', [StudentController::class, 'restore'])->name('students.restore');
@@ -63,10 +64,16 @@ Route::middleware(['auth', 'twofactor'])->group(function () {
     Route::get('students/{student}/preview-pdf', [StudentController::class, 'previewPdf'])->name('students.preview-pdf');
     Route::get('students/{student}/generate-zip', [StudentController::class, 'generateZip'])->name('students.generate-zip');
 
+    // XML
+    Route::get('students/xml', [StudentController::class, 'indexXml'])->name('students.xml');
+
+
     // Certificados
     Route::get('students/{student}/upload-certificate', [StudentController::class, 'showUploadCertificate'])->name('students.show-upload-certificate');
     Route::post('students/{student}/upload-certificate', [StudentController::class, 'uploadCertificate'])->name('students.upload-certificate');
     Route::get('certificates/{certificate}/download', [StudentController::class, 'downloadCertificate'])->name('certificates.download');
+
+    Route::resource('students', StudentController::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -77,7 +84,20 @@ Route::middleware(['auth', 'twofactor'])->group(function () {
     Route::resource('enrollments', EnrollmentController::class);
     Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Rutas de formulario XML
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('xml')->name('xml.')->group(function () {
+        Route::get('upload', [FileXmlController::class, 'create'])->name('upload');
+        Route::post('store', [FileXmlController::class, 'store'])->name('store');
+        Route::get('students', [FileXmlController::class, 'index'])->name('students');
+        Route::get('students/{student}', [FileXmlController::class, 'show'])->name('students.show');
+        Route::get('students/{student}/edit', [FileXmlController::class, 'edit'])->name('students.edit');
+        Route::put('students/{student}', [FileXmlController::class, 'update'])->name('students.update');
+        Route::delete('students/{student}', [FileXmlController::class, 'destroy'])->name('students.destroy');
+    });
 
 
 });

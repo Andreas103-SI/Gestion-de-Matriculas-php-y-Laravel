@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\StudentLog;
-use Illuminate\Support\Js;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\StudentLogsResource;
 

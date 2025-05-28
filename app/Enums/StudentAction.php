@@ -9,4 +9,15 @@ enum StudentAction: string
     case Deleted = 'deleted';
     case Restored = 'restored';
     case ForceDeleted = 'force_deleted';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Created => 'Created',
+            self::Updated => 'Updated',
+            self::Deleted => 'Deleted',
+            self::Restored => 'Restored',
+            self::ForceDeleted => 'Force Deleted',
+        };
+    }
 }

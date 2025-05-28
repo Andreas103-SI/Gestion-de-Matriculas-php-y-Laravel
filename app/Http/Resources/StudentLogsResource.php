@@ -17,10 +17,11 @@ class StudentLogsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name_user' => $this->name,
-            'name_student' => $this->student->first_name . ' ' . $this->student->last_name,
-            'email_student' => $this->student->email,
-
+            'name_user' => $this->name ?? 'Unknown User',
+            'name_student' => $this->student ? ($this->student->first_name . ' ' . $this->student->last_name) : 'Unknown Student',
+            'email_student' => $this->student->email ?? 'N/A',
+            'action_label' => $this->action->label(),
+            'deleted_at' => $this->deleted_at,
         ];
     }
 }
