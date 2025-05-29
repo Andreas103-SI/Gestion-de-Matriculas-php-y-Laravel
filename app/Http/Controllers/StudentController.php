@@ -18,8 +18,10 @@ class StudentController extends Controller
     // Muestra la lista de todos los estudiantes
     public function index(Request $request)
     {
-        $filter = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
-        $students = (new StudentSearch($filter))->search()->get();
+        $filters = $request->only(['search_term', 'first_name', 'last_name', 'email', 'dni_nie', 'disability']);
+        $search = new StudentSearch($filters);
+        $students = $search->filter()->get();
+
         return view('students.index', compact('students'));
     }
 
@@ -145,7 +147,7 @@ class StudentController extends Controller
     public function trashed(Request $request)
     {
         $filters = $request->only(['first_name', 'last_name', 'email', 'dni_nie', 'disability']);
-        $students = (new StudentSearch($filters))->search()->onlyTrashed()->get();
+        $students = (new StudentSearch($filters))->filter()->onlyTrashed()->get();
         return view('students.trashed', compact('students'));
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use App\Observers\StudentObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use App\Traits\NormalizeName;
 
 
@@ -37,30 +38,37 @@ class Student extends Model
 
 
     // Ámbitos locales
-    public function scopeSearchByFirstName(Builder $query, string $firstName): Builder
+    #[Scope]
+    protected function searchByFirstName(Builder $query, string $firstName): Builder
     {
         return $query->where('first_name', 'like', "%{$firstName}%");
     }
 
-    public function scopeSearchByLastName(Builder $query, string $lastName): Builder
+    #[Scope]
+    public function searchByLastName(Builder $query, string $lastName): Builder
     {
         return $query->where('last_name', 'like', "%{$lastName}%");
     }
 
-    public function scopeSearchByEmail(Builder $query, string $email): Builder
+    #[Scope]
+    public function searchByEmail(Builder $query, string $email): Builder
     {
         return $query->where('email', 'like', "%{$email}%");
     }
 
-    public function scopeSearchByDniNie(Builder $query, string $dniNie): Builder
+    #[Scope]
+    public function searchByDniNie(Builder $query, string $dniNie): Builder
     {
         return $query->where('dni_nie', 'like', "%{$dniNie}%");
     }
-
-    public function scopeHasDisability(Builder $query, bool $disability): Builder
+    #[Scope]
+    public function hasDisability(Builder $query, bool $disability): Builder
     {
         return $query->where('disability', $disability);
     }
+
+
+    // Relaciones
 
     public function courses()
     {
@@ -71,6 +79,7 @@ class Student extends Model
     {
         return $this->hasMany(Enrollment::class);
     }
+
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
